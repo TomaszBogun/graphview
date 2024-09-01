@@ -69,7 +69,7 @@ class FruchtermanReingoldAlgorithm implements Algorithm {
     tick *= 1.0 - currentIteration / iterations;
   }
 
-  void limitMaximumDisplacement(List<Node> nodes) {
+  void limitMaximumDisplacement(Set<Node> nodes) {
     nodes.forEach((node) {
       if (node != focusedNode) {
         var dispLength = max(EPSILON, displacement[node]!.distance);
@@ -80,7 +80,7 @@ class FruchtermanReingoldAlgorithm implements Algorithm {
     });
   }
 
-  void calculateAttraction(List<Edge> edges) {
+  void calculateAttraction(Set<Edge> edges) {
     edges.forEach((edge) {
       var source = edge.source;
       var destination = edge.destination;
@@ -95,7 +95,7 @@ class FruchtermanReingoldAlgorithm implements Algorithm {
     });
   }
 
-  void calculateRepulsion(List<Node> nodes) {
+  void calculateRepulsion(Set<Node> nodes) {
     nodes.forEach((nodeA) {
       nodes.forEach((nodeB) {
         if (nodeA != nodeB) {

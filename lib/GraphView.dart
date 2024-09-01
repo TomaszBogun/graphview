@@ -1,9 +1,8 @@
 library graphview;
-
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:math';
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -290,19 +289,20 @@ class _GraphViewAnimatedState extends State<_GraphViewAnimated> {
           size: MediaQuery.of(context).size,
           painter: EdgeRender(algorithm, graph, Offset(20, 20)),
         ),
-        ...List<Widget>.generate(graph.nodeCount(), (index) {
+        ...graph.nodes.map((node) {
           return Positioned(
             child: GestureDetector(
-              child: graph.nodes[index].data ?? widget.builder(graph.nodes[index]),
+              child: node.data ?? widget.builder(node),
               onPanUpdate: (details) {
-                graph.getNodeAtPosition(index).position += details.delta;
-                update();
+                setState(() {
+                  node.position += details.delta;
+                });
               },
             ),
-            top: graph.getNodeAtPosition(index).position.dy,
-            left: graph.getNodeAtPosition(index).position.dx,
+            top: node.position.dy,
+            left: node.position.dx,
           );
-        }),
+        }).toList(),
       ],
     );
   }

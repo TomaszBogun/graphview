@@ -120,6 +120,28 @@ class Graph {
     _cacheValid = false;
   }
 
+  void resetAllEdgesColours(Color color){
+    final paint = Paint()..color = color;
+    for (var edge in edges){
+      edge.paint = paint;
+    }
+    notifyGraphObserver();
+  }
+
+  // New method to recursively change the color of all successor edges down the tree
+  void changeAllParentAndChildEdgesColor(Node node, Color color) {
+    final paint = Paint()..color = color;
+    for (var edge in getOutEdges(node)) {
+      edge.paint = paint;
+      changeAllParentAndChildEdgesColor(edge.destination, color);
+    }
+    for (var edge in getInEdges(node)) {
+      edge.paint = paint;
+      changeAllParentAndChildEdgesColor(edge.source, color);
+    }
+    notifyGraphObserver();
+  }
+
   /// Whether this graph contains any nodes.
   bool hasNodes() => _nodes.isNotEmpty;
 

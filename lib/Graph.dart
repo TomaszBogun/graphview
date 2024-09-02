@@ -101,6 +101,28 @@ class Graph {
     _edges.removeWhere((edge) => edge.source == predecessor && edge.destination == current);
   }
 
+  void resetAllEdgesColours(Color color){
+    final paint = Paint()..color = color;
+    for (var edge in edges){
+      edge.paint = paint;
+    }
+    notifyGraphObserver();
+  }
+
+  // New method to recursively change the color of all successor edges down the tree
+  void changeAllParentAndChildEdgesColor(Node node, Color color) {
+    final paint = Paint()..color = color;
+    for (var edge in getOutEdges(node)) {
+      edge.paint = paint;
+      changeAllParentAndChildEdgesColor(edge.destination, color);
+    }
+    for (var edge in getInEdges(node)) {
+      edge.paint = paint;
+      changeAllParentAndChildEdgesColor(edge.source, color);
+    }
+    notifyGraphObserver();
+  }
+
   bool hasNodes() => _nodes.isNotEmpty;
 
   Edge? getEdgeBetween(Node source, Node? destination) {

@@ -71,28 +71,6 @@ class Graph {
     }
   }
 
-  void resetAllEdgesColours(Color color){
-    final paint = Paint()..color = color;
-    for (var edge in edges){
-      edge.paint = paint;
-    }
-    notifyGraphObserver();
-  }
-
-  // New method to recursively change the color of all successor edges down the tree
-  void changeAllParentAndChildEdgesColor(Node node, Color color) {
-    final paint = Paint()..color = color;
-    for (var edge in getOutEdges(node)) {
-      edge.paint = paint;
-      changeAllParentAndChildEdgesColor(edge.destination, color);
-    }
-    for (var edge in getInEdges(node)) {
-      edge.paint = paint;
-      changeAllParentAndChildEdgesColor(edge.source, color);
-    }
-    notifyGraphObserver();
-  }
-
   void addEdges(List<Edge> edges) => edges.forEach((it) => addEdgeS(it));
 
   void removeEdge(Edge edge) => _edges.remove(edge);

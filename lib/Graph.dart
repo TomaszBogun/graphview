@@ -131,20 +131,34 @@ class Graph {
   // New method to recursively change the color of all successor edges down the tree
   void changeAllChildEdgesColor(Node node, Color color) {
     final paint = Paint()..color = color;
+    changeAllChildEdgesColorHelper(node, paint, {});
+    notifyGraphObserver();
+  }
+
+  void changeAllChildEdgesColorHelper(Node node, Paint paint, Set<String> nodesVisited){
     for (var edge in getOutEdges(node)) {
       edge.paint = paint;
-      changeAllChildEdgesColor(edge.destination, color);
+      if(!nodesVisited.contains(edge.destination.key.toString())){
+        nodesVisited.add(edge.destination.key.toString());
+        changeAllChildEdgesColorHelper(edge.destination, paint, nodesVisited);
+      }
     }
-    notifyGraphObserver();
   }
 
   void changeAllParentEdgesColor(Node node, Color color) {
     final paint = Paint()..color = color;
+    changeAllParentEdgesColorHelper(node, paint, {});
+    notifyGraphObserver();
+  }
+
+  void changeAllParentEdgesColorHelper(Node node, Paint paint, Set<String> nodesVisited){
     for (var edge in getInEdges(node)) {
       edge.paint = paint;
-      changeAllParentEdgesColor(edge.source, color);
+      if(!nodesVisited.contains(edge.destination.key.toString())){
+        nodesVisited.add(edge.destination.key.toString());
+        changeAllParentEdgesColorHelper(edge.destination, paint, nodesVisited);
+      }
     }
-    notifyGraphObserver();
   }
 
   /// Whether this graph contains any nodes.
@@ -236,8 +250,8 @@ class Graph {
 
   /// Notifies all registered [graphObserver]s that the graph has changed.
   void notifyGraphObserver() => graphObserver.forEach((element) {
-        element.notifyGraphInvalidated();
-      });
+    element.notifyGraphInvalidated();
+  });
 
   /// Serializes the graph to a JSON string with node hashes and edge mappings.
   String toJson() {

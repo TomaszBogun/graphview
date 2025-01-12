@@ -45,7 +45,17 @@ class Graph {
     if (isTree) {
       successorsOf(node).forEach((element) => removeNode(element));
     }
+    _nodes.remove(node);
+    _edges
+        .removeWhere((edge) => edge.source == node || edge.destination == node);
+    _cacheValid = false;
+    notifyGraphObserver();
+  }
 
+  /// Removes a single [node] without recursing into successors, even if [isTree].
+  /// Use this when the graph contains cycles where the recursive [removeNode] would loop.
+  void removeSingleNode(Node? node) {
+    if (!_nodes.contains(node)) return;
     _nodes.remove(node);
     _edges
         .removeWhere((edge) => edge.source == node || edge.destination == node);

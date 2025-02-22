@@ -164,9 +164,9 @@ class Graph {
   void changeAllParentEdgesColorHelper(Node node, Paint paint, Set<String> nodesVisited){
     for (var edge in getInEdges(node)) {
       edge.paint = paint;
-      if(!nodesVisited.contains(edge.destination.key.toString())){
-        nodesVisited.add(edge.destination.key.toString());
-        changeAllParentEdgesColorHelper(edge.destination, paint, nodesVisited);
+      if(!nodesVisited.contains(edge.source.key.toString())){
+        nodesVisited.add(edge.source.key.toString());
+        changeAllParentEdgesColorHelper(edge.source, paint, nodesVisited);
       }
     }
   }

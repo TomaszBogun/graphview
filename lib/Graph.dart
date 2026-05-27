@@ -114,6 +114,53 @@ class Graph {
   /// Adds multiple [edges] to the graph.
   void addEdges(List<Edge> edges) => edges.forEach((it) => addEdgeS(it));
 
+  /// Fast O(1) edge insert with NO node canonicalization or edge dedup.
+  /// Caller MUST run [deduplicate] at the end of the batch.
+  void addEdgeFast(Node source, Node destination, {Paint? paint}) {
+    _nodes.add(source);
+    _nodes.add(destination);
+    _edges.add(Edge(source, destination, paint: paint));
+    _cacheValid = false;
+  }
+
+  /// Canonicalize nodes (one instance per key) and dedup edges in a single
+  /// O(N + E) sweep. Run once at the end of a bulk-add batch that used
+  /// [addEdgeFast]. Safe to call even if no fast adds happened.
+  void deduplicate() {
+    // 1. Build canonical node map (first occurrence wins, preserves insertion order)
+    final dedupedNodes = LinkedHashSet<Node>.from(_nodes);
+    final canonical = <ValueKey, Node>{};
+    for (final node in dedupedNodes) {
+      if (node.key != null) canonical[node.key!] = node;
+    }
+    _nodes
+      ..clear()
+      ..addAll(dedupedNodes);
+
+    // 2. Rewrite every edge's source/destination to the canonical instance
+    for (final edge in _edges) {
+      final ksrc = edge.source.key;
+      if (ksrc != null) {
+        final c = canonical[ksrc];
+        if (c != null) edge.source = c;
+      }
+      final kdst = edge.destination.key;
+      if (kdst != null) {
+        final c = canonical[kdst];
+        if (c != null) edge.destination = c;
+      }
+    }
+
+    // 3. Dedup edges (Edge equality is source+destination hash)
+    final dedupedEdges = LinkedHashSet<Edge>.from(_edges);
+    _edges
+      ..clear()
+      ..addAll(dedupedEdges);
+
+    _cacheValid = false;
+    notifyGraphObserver();
+  }
+
   /// Removes an [edge] from the graph.
   void removeEdge(Edge edge) {
     _edges.remove(edge);
